@@ -14,7 +14,7 @@ class MasterViewController: UITableViewController {
 
     private var refreshing = false
 
-    var refreshInterval: NSTimeInterval = 6.42
+    var refreshInterval: NSTimeInterval = 8.42
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,8 +27,6 @@ class MasterViewController: UITableViewController {
 
         self.tableView.estimatedRowHeight = 89
         self.tableView.rowHeight = UITableViewAutomaticDimension
-
-        NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: true)
 
         var refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshData", forControlEvents: UIControlEvents.ValueChanged)
@@ -45,6 +43,7 @@ class MasterViewController: UITableViewController {
                 self.tableView.endUpdates()
 
                 self.refreshControl!.endRefreshing()
+                self.startRefreshTimer()
                 self.refreshing = false
             }
         }
@@ -54,6 +53,7 @@ class MasterViewController: UITableViewController {
                 self.navigationItem.prompt = "Data can not be loaded"
 
                 self.refreshControl!.endRefreshing()
+                self.startRefreshTimer()
                 self.refreshing = false
             }
         }
@@ -105,6 +105,10 @@ class MasterViewController: UITableViewController {
             self.refreshControl!.beginRefreshing()
             self.dataSource.refresh()
         }
+    }
+
+    private func startRefreshTimer(repeat: Bool = false) {
+        NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: repeat)
     }
 
     private func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
