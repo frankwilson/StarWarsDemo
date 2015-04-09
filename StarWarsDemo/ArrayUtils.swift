@@ -8,11 +8,11 @@
 
 import UIKit
 
-func swd_intersect<T where T: Equatable>(first: [T], other: [T]) -> [T] {
+public func swd_intersect<T where T: Equatable>(first: [T], other: [T]) -> [T] {
     return first.filter({ swd_contains(other, $0) })
 }
 
-func swd_contains<T where T: Equatable>(container: [T], element: T) -> Bool {
+public func swd_contains<T where T: Equatable>(container: [T], element: T) -> Bool {
     for elemToCheck in container {
         if element == elemToCheck {
             return true;
@@ -21,6 +21,6 @@ func swd_contains<T where T: Equatable>(container: [T], element: T) -> Bool {
     return false
 }
 
-func swd_substract<T where T: Equatable>(first: [T], other: [T]) -> [T] {
+public func swd_substract<T where T: Equatable>(first: [T], other: [T]) -> [T] {
     return first.filter({ !swd_contains(other, $0) })
 }

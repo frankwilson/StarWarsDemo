@@ -18,7 +18,7 @@ func ==(lhs: Citation, rhs: Citation) -> Bool {
     return lhs.id == rhs.id
 }
 
-private let sourceUrlStr = "http://crazy-dev.wheely.com"
+private let sourceUrlStr = "http://crazy-dev.wheely.com/"
 
 func mapper(data: [String: AnyObject]) -> Citation {
     let id = (data["id"] as NSNumber).integerValue
@@ -37,6 +37,7 @@ class CitationDataSource {
     private(set) var citations = [Citation]()
 
     var dataChangedCallback: DataChangedCallback?
+    var errorCallback: ((NSError) -> Void)?
 
     init() {
         self.session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
@@ -45,29 +46,24 @@ class CitationDataSource {
     private func fetch() {
         let url = NSURL(string: sourceUrlStr)!;
         let task = self.session.dataTaskWithURL(url) { (result, response, error) -> Void in
-            var error: NSError?
-            var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as [[String: AnyObject]]?
-
-            if let citationsRaw = citations {
-                let citations = citationsRaw.map(mapper).sorted({ $0.id < $1.id })
-
-                let oldCitations = self.citations
-                self.log("Old objects set", citations: self.citations)
-                self.citations = citations
-                self.log("New objects set", citations: self.citations)
-
-                if let callback = self.dataChangedCallback {
-                    let intersecton = swd_intersect(oldCitations, citations)
-                    let toRemove = swd_substract(oldCitations, intersecton)
-                    let toAdd = swd_substract(citations, intersecton)
-                    self.log("Objects to remove", citations: toRemove)
-                    self.log ("Objects to add", citations: toAdd)
-
-                    callback(removed: self.indexSet(oldCitations, target: toRemove), added: self.indexSet(citations, target: toAdd))
+            if response == nil {
+                NSLog("Something's not right! Server did not return an array of data!")
+                if let callback = self.errorCallback {
+                    callback(error!)
                 }
             } else {
-                NSLog("Something's not right! Server did not return an array of data!")
+                var error: NSError?
+                var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as [[String: AnyObject]]?
+                if let citationsRaw = citations {
+                    self.processFetchedResult(citationsRaw)
+                } else {
+                    NSLog("Something's not right! Can't parse the data!")
+                    if let callback = self.errorCallback {
+                        callback(error!)
+                    }
+                }
             }
+
             UIApplication.sharedApplication().networkActivityIndicatorVisible = false
         }
 
@@ -77,6 +73,25 @@ class CitationDataSource {
 
     func refresh() {
         fetch()
+    }
+
+    private func processFetchedResult(result: [[String: AnyObject]]) {
+        let citations = result.map(mapper).sorted({ $0.id < $1.id })
+
+        let oldCitations = self.citations
+        self.log("Old objects set", citations: self.citations)
+        self.citations = citations
+        self.log("New objects set", citations: self.citations)
+
+        if let callback = self.dataChangedCallback {
+            let intersecton = swd_intersect(oldCitations, citations)
+            let toRemove = swd_substract(oldCitations, intersecton)
+            let toAdd = swd_substract(citations, intersecton)
+            self.log("Objects to remove", citations: toRemove)
+            self.log ("Objects to add", citations: toAdd)
+
+            callback(removed: self.indexSet(oldCitations, target: toRemove), added: self.indexSet(citations, target: toAdd))
+        }
     }
 
     /// We know that both arrays are sorted!

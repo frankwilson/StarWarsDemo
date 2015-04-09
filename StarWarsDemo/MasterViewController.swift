@@ -12,7 +12,9 @@ class MasterViewController: UITableViewController {
 
     private let dataSource = CitationDataSource()
 
-    private var refreshButton: UIBarButtonItem!
+    private var refreshing = false
+
+    var refreshInterval: NSTimeInterval = 6.42
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -21,23 +23,46 @@ class MasterViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let refreshButton = UIBarButtonItem(barButtonSystemItem: .Refresh, target: self, action: "refreshData")
-        refreshButton.enabled = false
-        self.navigationItem.rightBarButtonItem = refreshButton
-        self.refreshButton = refreshButton
+        self.title = "Star Wars Quotes"
+
+        self.tableView.estimatedRowHeight = 89
+        self.tableView.rowHeight = UITableViewAutomaticDimension
+
+        NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: true)
+
+        var refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshData", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.attributedTitle = NSAttributedString(string: "Refreshing...")
+        self.refreshControl = refreshControl
 
         self.dataSource.dataChangedCallback = { [unowned self] (removed, added) in
             dispatch_async(dispatch_get_main_queue()) {
+                self.navigationItem.prompt = nil
+
                 self.tableView.beginUpdates()
                 self.tableView.deleteRowsAtIndexPaths(self.indexPaths(removed), withRowAnimation: .Fade)
                 self.tableView.insertRowsAtIndexPaths(self.indexPaths(added), withRowAnimation: .Fade)
                 self.tableView.endUpdates()
 
-                self.refreshButton.enabled = true
+                self.refreshControl!.endRefreshing()
+                self.refreshing = false
             }
         }
+        self.dataSource.errorCallback = { [unowned self] error in
+            dispatch_async(dispatch_get_main_queue()) {
+                NSLog("error: \(error)")
+                self.navigationItem.prompt = "Data can not be loaded"
 
-        self.dataSource.refresh()
+                self.refreshControl!.endRefreshing()
+                self.refreshing = false
+            }
+        }
+    }
+
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+
+        self.refreshData()
     }
 
     // MARK: - Segues
@@ -73,9 +98,13 @@ class MasterViewController: UITableViewController {
     }
 
     // MARK: - Other functions
+    // Called by timer to refresh data
     func refreshData() {
-        self.refreshButton.enabled = false
-        self.dataSource.refresh()
+        if !self.refreshing {
+            self.refreshing = true
+            self.refreshControl!.beginRefreshing()
+            self.dataSource.refresh()
+        }
     }
 
     private func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
