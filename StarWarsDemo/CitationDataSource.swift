@@ -21,9 +21,9 @@ func ==(lhs: Citation, rhs: Citation) -> Bool {
 private let sourceUrlStr = "http://crazy-dev.wheely.com/"
 
 func mapper(data: [String: AnyObject]) -> Citation {
-    let id = (data["id"] as NSNumber).integerValue
-    let title = data["title"] as String
-    let text = data["text"] as String
+    let id = (data["id"] as! NSNumber).integerValue
+    let title = data["title"] as! String
+    let text = data["text"] as! String
 
     return Citation(id: id, title: title, text: text)
 }
@@ -53,7 +53,7 @@ class CitationDataSource {
                 }
             } else {
                 var error: NSError?
-                var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as [[String: AnyObject]]?
+                var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as! [[String: AnyObject]]?
                 if let citationsRaw = citations {
                     self.processFetchedResult(citationsRaw)
                 } else {

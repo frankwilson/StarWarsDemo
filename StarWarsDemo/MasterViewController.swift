@@ -71,7 +71,7 @@ class MasterViewController: UITableViewController {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow() {
                 let object = dataSource.citations[indexPath.row]
-                (segue.destinationViewController as DetailViewController).detailItem = object
+                (segue.destinationViewController as! DetailViewController).detailItem = object
             }
         }
     }
@@ -83,7 +83,7 @@ class MasterViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as MasterTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! MasterTableViewCell
 
         let object = dataSource.citations[indexPath.row]
 
