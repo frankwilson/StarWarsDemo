@@ -8,39 +8,45 @@
 
 import UIKit
 
-struct Citation: Equatable {
+struct Quote: Equatable {
     let id: Int
     let title: String
     let text: String
 }
 
-func ==(lhs: Citation, rhs: Citation) -> Bool {
+func ==(lhs: Quote, rhs: Quote) -> Bool {
     return lhs.id == rhs.id
 }
 
 private let sourceUrlStr = "http://crazy-dev.wheely.com/"
 
-func mapper(data: [String: AnyObject]) -> Citation {
-    let id = (data["id"] as! NSNumber).integerValue
-    let title = data["title"] as! String
-    let text = data["text"] as! String
+func mapper(data: [String: AnyObject]) -> Quote? {
+    let id = data["id"] as? NSNumber
+    let title = data["title"] as? String
+    let text = data["text"] as? String
 
-    return Citation(id: id, title: title, text: text)
+    if (id == nil || title == nil || text == nil) {
+        return nil
+    }
+
+    return Quote(id: id!.integerValue, title: title!, text: text!)
 }
 
 typealias DataChangedCallback = (removed: NSIndexSet, added: NSIndexSet) -> Void
 
 class CitationDataSource {
 
-    private let session: NSURLSession
+    private let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
 
-    private(set) var citations = [Citation]()
+    private(set) var quotes = [Quote]()
 
     var dataChangedCallback: DataChangedCallback?
     var errorCallback: ((NSError) -> Void)?
 
+    // Does not compile without default initializer
     init() {
-        self.session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+        // I could add network reachability check here, but I didn't
+        // https://github.com/belkevich/reachability-ios
     }
 
     private func fetch() {
@@ -53,7 +59,7 @@ class CitationDataSource {
                 }
             } else {
                 var error: NSError?
-                var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as! [[String: AnyObject]]?
+                var citations = NSJSONSerialization.JSONObjectWithData(result, options: nil, error: &error) as [[String: AnyObject]]?
                 if let citationsRaw = citations {
                     self.processFetchedResult(citationsRaw)
                 } else {
@@ -76,27 +82,30 @@ class CitationDataSource {
     }
 
     private func processFetchedResult(result: [[String: AnyObject]]) {
-        let citations = result.map(mapper).sorted({ $0.id < $1.id })
+        // Transform Dictionary to Quote
+        // Then remove nil optionals
+        // Then transform optionals to non-optionals
+        let quotes = result.map(mapper).filter({ $0 != nil }).map({ $0! }).sorted({ $0.id < $1.id })
 
-        let oldCitations = self.citations
-        self.log("Old objects set", citations: self.citations)
-        self.citations = citations
-        self.log("New objects set", citations: self.citations)
+        let previousQuotes = self.quotes
+        self.log("Old objects set", quotes: self.quotes)
+        self.quotes = quotes
+        self.log("New objects set", quotes: self.quotes)
 
         if let callback = self.dataChangedCallback {
-            let intersecton = swd_intersect(oldCitations, citations)
-            let toRemove = swd_substract(oldCitations, intersecton)
-            let toAdd = swd_substract(citations, intersecton)
-            self.log("Objects to remove", citations: toRemove)
-            self.log ("Objects to add", citations: toAdd)
+            let intersecton = swd_intersect(previousQuotes, quotes)
+            let toRemove = swd_substract(previousQuotes, intersecton)
+            let toAdd = swd_substract(quotes, intersecton)
+            self.log("Objects to remove", quotes: toRemove)
+            self.log ("Objects to add", quotes: toAdd)
 
-            callback(removed: self.indexSet(oldCitations, target: toRemove), added: self.indexSet(citations, target: toAdd))
+            callback(removed: self.indexSet(toRemove, inContainer: previousQuotes), added: self.indexSet(toAdd, inContainer:quotes))
         }
     }
 
     /// We know that both arrays are sorted!
     /// And we know that container contains all elements of target
-    private func indexSet(container: [Citation], target: [Citation]) -> NSIndexSet {
+    private func indexSet(target: [Quote], inContainer container: [Quote]) -> NSIndexSet {
         var checkedIndex = 0
         var result = NSMutableIndexSet()
         for (index, element) in enumerate(container) {
@@ -116,8 +125,8 @@ class CitationDataSource {
         return NSIndexSet(indexSet: result)
     }
 
-    private func log(prefixMessage: String, citations: [Citation]) {
-        let objects = ", ".join(citations.map({ "\($0.id)" }))
+    private func log(prefixMessage: String, quotes: [Quote]) {
+        let objects = ", ".join(quotes.map({ "\($0.id)" }))
         NSLog("\(prefixMessage): \(objects)")
     }
 }

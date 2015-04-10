@@ -10,9 +10,9 @@ import UIKit
 
 class DetailViewController: UIViewController {
 
-    @IBOutlet weak var detailDescriptionLabel: UILabel?
+    @IBOutlet weak var quoteTextLabel: UILabel?
 
-    var detailItem: Citation? {
+    var currentQuote: Quote? {
         didSet {
             // Update the view.
             self.configureView()
@@ -21,9 +21,9 @@ class DetailViewController: UIViewController {
 
     func configureView() {
         // Update the user interface for the detail item.
-        if let detail = self.detailItem {
-            self.title = detail.title
-            self.detailDescriptionLabel?.text = detail.text
+        if let quote = self.currentQuote {
+            self.title = quote.title
+            self.quoteTextLabel?.text = quote.text
         }
     }
 

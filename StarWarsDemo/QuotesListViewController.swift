@@ -8,17 +8,15 @@
 
 import UIKit
 
-class MasterViewController: UITableViewController {
+class QuotesListViewController: UITableViewController {
 
     private let dataSource = CitationDataSource()
 
     private var refreshing = false
+    weak private var refreshTimer: NSTimer?
 
+    // Interval can be changed from outside
     var refreshInterval: NSTimeInterval = 8.42
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,14 +33,14 @@ class MasterViewController: UITableViewController {
 
         self.dataSource.dataChangedCallback = { [unowned self] (removed, added) in
             dispatch_async(dispatch_get_main_queue()) {
+                self.refreshControl!.endRefreshing()
                 self.navigationItem.prompt = nil
 
                 self.tableView.beginUpdates()
-                self.tableView.deleteRowsAtIndexPaths(self.indexPaths(removed), withRowAnimation: .Fade)
-                self.tableView.insertRowsAtIndexPaths(self.indexPaths(added), withRowAnimation: .Fade)
+                self.tableView.deleteRowsAtIndexPaths(indexPaths(removed), withRowAnimation: .Fade)
+                self.tableView.insertRowsAtIndexPaths(indexPaths(added), withRowAnimation: .Fade)
                 self.tableView.endUpdates()
 
-                self.refreshControl!.endRefreshing()
                 self.startRefreshTimer()
                 self.refreshing = false
             }
@@ -70,8 +68,8 @@ class MasterViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow() {
-                let object = dataSource.citations[indexPath.row]
-                (segue.destinationViewController as! DetailViewController).detailItem = object
+                let quoteToPresent = dataSource.quotes[indexPath.row]
+                (segue.destinationViewController as DetailViewController).currentQuote = quoteToPresent
             }
         }
     }
@@ -79,13 +77,13 @@ class MasterViewController: UITableViewController {
     // MARK: - Table View
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.citations.count
+        return dataSource.quotes.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! MasterTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as QuoteTableViewCell
 
-        let object = dataSource.citations[indexPath.row]
+        let object = dataSource.quotes[indexPath.row]
 
         cell.titleLabel.text = object.title
         cell.descriptionLabel.text = object.text
@@ -102,25 +100,29 @@ class MasterViewController: UITableViewController {
     func refreshData() {
         if !self.refreshing {
             self.refreshing = true
-            self.refreshControl!.beginRefreshing()
+            if !self.refreshControl!.refreshing {
+                self.refreshControl!.beginRefreshing()
+            }
             self.dataSource.refresh()
+            self.refreshTimer?.invalidate()
         }
     }
 
     private func startRefreshTimer(repeat: Bool = false) {
-        NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: repeat)
-    }
-
-    private func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
-        var indexPaths = [NSIndexPath]()
-        indexSet.enumerateIndexesUsingBlock { (index, stop) -> Void in
-            indexPaths.append(NSIndexPath(forRow: index, inSection: 0))
-        }
-        return indexPaths
+        self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: repeat)
     }
 }
 
-class MasterTableViewCell: UITableViewCell {
+func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
+    var indexPaths = [NSIndexPath]()
+    indexSet.enumerateIndexesUsingBlock { (index, stop) -> Void in
+        indexPaths.append(NSIndexPath(forRow: index, inSection: 0))
+    }
+    return indexPaths
+}
+
+
+class QuoteTableViewCell: UITableViewCell {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var descriptionLabel: UILabel!
 

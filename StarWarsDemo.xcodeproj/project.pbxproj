@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		C8A5598E1AD5D265009792CA /* ArrayUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5598D1AD5D265009792CA /* ArrayUtils.swift */; };
 		C8EB65201AD5BFF100C55373 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */; };
-		C8EB65221AD5BFF100C55373 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65211AD5BFF100C55373 /* MasterViewController.swift */; };
+		C8EB65221AD5BFF100C55373 /* QuotesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65211AD5BFF100C55373 /* QuotesListViewController.swift */; };
 		C8EB65241AD5BFF100C55373 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65231AD5BFF100C55373 /* DetailViewController.swift */; };
 		C8EB65271AD5BFF100C55373 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8EB65251AD5BFF100C55373 /* Main.storyboard */; };
 		C8EB65291AD5BFF100C55373 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8EB65281AD5BFF100C55373 /* Images.xcassets */; };
@@ -33,7 +33,7 @@
 		C8EB651A1AD5BFF100C55373 /* StarWarsDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8EB651E1AD5BFF100C55373 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C8EB65211AD5BFF100C55373 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
+		C8EB65211AD5BFF100C55373 /* QuotesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotesListViewController.swift; sourceTree = "<group>"; };
 		C8EB65231AD5BFF100C55373 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		C8EB65261AD5BFF100C55373 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C8EB65281AD5BFF100C55373 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -84,7 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */,
-				C8EB65211AD5BFF100C55373 /* MasterViewController.swift */,
+				C8EB65211AD5BFF100C55373 /* QuotesListViewController.swift */,
 				C8EB65231AD5BFF100C55373 /* DetailViewController.swift */,
 				C8EB65251AD5BFF100C55373 /* Main.storyboard */,
 				C8EB65281AD5BFF100C55373 /* Images.xcassets */,
@@ -223,7 +223,7 @@
 			files = (
 				C8EB65241AD5BFF100C55373 /* DetailViewController.swift in Sources */,
 				C8EB65421AD5C38300C55373 /* CitationDataSource.swift in Sources */,
-				C8EB65221AD5BFF100C55373 /* MasterViewController.swift in Sources */,
+				C8EB65221AD5BFF100C55373 /* QuotesListViewController.swift in Sources */,
 				C8A5598E1AD5D265009792CA /* ArrayUtils.swift in Sources */,
 				C8EB65201AD5BFF100C55373 /* AppDelegate.swift in Sources */,
 			);
