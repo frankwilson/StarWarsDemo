@@ -8,29 +8,31 @@
 
 import UIKit
 
+/// Class shows full text of a quote
 class DetailViewController: UIViewController {
 
     @IBOutlet weak var quoteTextLabel: UILabel?
 
+    /// Current quote model
     var currentQuote: Quote? {
         didSet {
             // Update the view.
-            self.configureView()
+            configureView()
         }
     }
 
     func configureView() {
         // Update the user interface for the detail item.
-        if let quote = self.currentQuote {
-            self.title = quote.title
-            self.quoteTextLabel?.text = quote.text
+        if let quote = currentQuote {
+            title = quote.title
+            quoteTextLabel?.text = quote.text
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.configureView()
+        configureView()
     }
 
 }

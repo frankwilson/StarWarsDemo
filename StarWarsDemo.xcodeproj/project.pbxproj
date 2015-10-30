@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C8A5598E1AD5D265009792CA /* ArrayUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A5598D1AD5D265009792CA /* ArrayUtils.swift */; };
 		C8EB65201AD5BFF100C55373 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */; };
 		C8EB65221AD5BFF100C55373 /* QuotesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65211AD5BFF100C55373 /* QuotesListViewController.swift */; };
 		C8EB65241AD5BFF100C55373 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65231AD5BFF100C55373 /* DetailViewController.swift */; };
@@ -15,7 +14,7 @@
 		C8EB65291AD5BFF100C55373 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8EB65281AD5BFF100C55373 /* Images.xcassets */; };
 		C8EB652C1AD5BFF100C55373 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8EB652A1AD5BFF100C55373 /* LaunchScreen.xib */; };
 		C8EB65381AD5BFF100C55373 /* StarWarsDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65371AD5BFF100C55373 /* StarWarsDemoTests.swift */; };
-		C8EB65421AD5C38300C55373 /* CitationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65411AD5C38300C55373 /* CitationDataSource.swift */; };
+		C8EB65421AD5C38300C55373 /* QuotesDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8EB65411AD5C38300C55373 /* QuotesDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,7 +28,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C8A5598D1AD5D265009792CA /* ArrayUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayUtils.swift; sourceTree = "<group>"; };
 		C8EB651A1AD5BFF100C55373 /* StarWarsDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarWarsDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8EB651E1AD5BFF100C55373 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -41,7 +39,7 @@
 		C8EB65311AD5BFF100C55373 /* StarWarsDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StarWarsDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8EB65361AD5BFF100C55373 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8EB65371AD5BFF100C55373 /* StarWarsDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarWarsDemoTests.swift; sourceTree = "<group>"; };
-		C8EB65411AD5C38300C55373 /* CitationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CitationDataSource.swift; sourceTree = "<group>"; };
+		C8EB65411AD5C38300C55373 /* QuotesDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuotesDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,13 +83,12 @@
 			children = (
 				C8EB651F1AD5BFF100C55373 /* AppDelegate.swift */,
 				C8EB65211AD5BFF100C55373 /* QuotesListViewController.swift */,
+				C8EB65411AD5C38300C55373 /* QuotesDataSource.swift */,
 				C8EB65231AD5BFF100C55373 /* DetailViewController.swift */,
 				C8EB65251AD5BFF100C55373 /* Main.storyboard */,
 				C8EB65281AD5BFF100C55373 /* Images.xcassets */,
 				C8EB652A1AD5BFF100C55373 /* LaunchScreen.xib */,
 				C8EB651D1AD5BFF100C55373 /* Supporting Files */,
-				C8EB65411AD5C38300C55373 /* CitationDataSource.swift */,
-				C8A5598D1AD5D265009792CA /* ArrayUtils.swift */,
 			);
 			path = StarWarsDemo;
 			sourceTree = "<group>";
@@ -165,6 +162,8 @@
 		C8EB65121AD5BFF100C55373 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0710;
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0620;
 				ORGANIZATIONNAME = "Pavel Kazantsev";
 				TargetAttributes = {
@@ -222,9 +221,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8EB65241AD5BFF100C55373 /* DetailViewController.swift in Sources */,
-				C8EB65421AD5C38300C55373 /* CitationDataSource.swift in Sources */,
+				C8EB65421AD5C38300C55373 /* QuotesDataSource.swift in Sources */,
 				C8EB65221AD5BFF100C55373 /* QuotesListViewController.swift in Sources */,
-				C8A5598E1AD5D265009792CA /* ArrayUtils.swift in Sources */,
 				C8EB65201AD5BFF100C55373 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

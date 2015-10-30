@@ -8,11 +8,15 @@
 
 import UIKit
 
+/// The class represents a view controller displaying a list of quotes
 class QuotesListViewController: UITableViewController {
 
-    private let dataSource = CitationDataSource()
+    /// The quotes data source
+    private let dataSource = QuotesDataSource()
 
+    /// Indicates if data is currently being refreshed
     private var refreshing = false
+    /// Timer that runs a data refresh
     weak private var refreshTimer: NSTimer?
 
     // Interval can be changed from outside
@@ -21,40 +25,15 @@ class QuotesListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.title = "Star Wars Quotes"
+        title = "Star Wars Quotes"
 
-        self.tableView.estimatedRowHeight = 89
-        self.tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 89
+        tableView.rowHeight = UITableViewAutomaticDimension
 
-        var refreshControl = UIRefreshControl()
+        let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshData", forControlEvents: UIControlEvents.ValueChanged)
         refreshControl.attributedTitle = NSAttributedString(string: "Refreshing...")
         self.refreshControl = refreshControl
-
-        self.dataSource.dataChangedCallback = { [unowned self] (removed, added) in
-            dispatch_async(dispatch_get_main_queue()) {
-                self.refreshControl!.endRefreshing()
-                self.navigationItem.prompt = nil
-
-                self.tableView.beginUpdates()
-                self.tableView.deleteRowsAtIndexPaths(indexPaths(removed), withRowAnimation: .Fade)
-                self.tableView.insertRowsAtIndexPaths(indexPaths(added), withRowAnimation: .Fade)
-                self.tableView.endUpdates()
-
-                self.startRefreshTimer()
-                self.refreshing = false
-            }
-        }
-        self.dataSource.errorCallback = { [unowned self] error in
-            dispatch_async(dispatch_get_main_queue()) {
-                NSLog("error: \(error)")
-                self.navigationItem.prompt = "Data can not be loaded"
-
-                self.refreshControl!.endRefreshing()
-                self.startRefreshTimer()
-                self.refreshing = false
-            }
-        }
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -67,9 +46,11 @@ class QuotesListViewController: UITableViewController {
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
-            if let indexPath = self.tableView.indexPathForSelectedRow() {
+            if let indexPath = tableView.indexPathForSelectedRow {
                 let quoteToPresent = dataSource.quotes[indexPath.row]
-                (segue.destinationViewController as DetailViewController).currentQuote = quoteToPresent
+                if let detailViewController = segue.destinationViewController as? DetailViewController {
+                    detailViewController.currentQuote = quoteToPresent
+                }
             }
         }
     }
@@ -81,7 +62,7 @@ class QuotesListViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as QuoteTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! QuoteTableViewCell
 
         let object = dataSource.quotes[indexPath.row]
 
@@ -98,22 +79,51 @@ class QuotesListViewController: UITableViewController {
     // MARK: - Other functions
     // Called by timer to refresh data
     func refreshData() {
-        if !self.refreshing {
-            self.refreshing = true
-            if !self.refreshControl!.refreshing {
-                self.refreshControl!.beginRefreshing()
+        if !refreshing {
+            refreshing = true
+            if let refreshControl = self.refreshControl where refreshControl.refreshing == false {
+                refreshControl.beginRefreshing()
             }
-            self.dataSource.refresh()
-            self.refreshTimer?.invalidate()
+            dataSource.fetch({ [weak self] (removed, added) in
+                guard let vc = self else {
+                    return
+                }
+                dispatch_async(dispatch_get_main_queue()) {
+                    vc.refreshControl?.endRefreshing()
+                    vc.navigationItem.prompt = nil
+
+                    vc.tableView.beginUpdates()
+                    vc.tableView.deleteRowsAtIndexPaths(convertToIndexPaths(removed), withRowAnimation: .Fade)
+                    vc.tableView.insertRowsAtIndexPaths(convertToIndexPaths(added), withRowAnimation: .Fade)
+                    vc.tableView.endUpdates()
+
+                    vc.startRefreshTimer()
+                    vc.refreshing = false
+                }
+            }, errorCallback: { [weak self] error in
+                guard let vc = self else {
+                    return
+                }
+                dispatch_async(dispatch_get_main_queue()) {
+                    NSLog("error: \(error)")
+                    vc.navigationItem.prompt = "Data can not be loaded"
+                    vc.refreshControl?.endRefreshing()
+                    vc.startRefreshTimer()
+                    vc.refreshing = false
+                }
+            })
+            refreshTimer?.invalidate()
         }
     }
 
-    private func startRefreshTimer(repeat: Bool = false) {
-        self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: repeat)
+    /// Creates a new timer that updates data for the table view
+    private func startRefreshTimer(shouldRepeat: Bool = false) {
+        refreshTimer = NSTimer.scheduledTimerWithTimeInterval(refreshInterval, target: self, selector: "refreshData", userInfo: nil, repeats: shouldRepeat)
     }
 }
 
-func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
+/// Converts s NSIndexSet to an array of NSIndexPath with value from index set as a row index and 0 as a section index
+func convertToIndexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
     var indexPaths = [NSIndexPath]()
     indexSet.enumerateIndexesUsingBlock { (index, stop) -> Void in
         indexPaths.append(NSIndexPath(forRow: index, inSection: 0))
@@ -121,9 +131,12 @@ func indexPaths(indexSet: NSIndexSet) -> [NSIndexPath] {
     return indexPaths
 }
 
-
+/// The class represents a table view cell for a Quote
 class QuoteTableViewCell: UITableViewCell {
+
+    /// Quote title
     @IBOutlet var titleLabel: UILabel!
+    /// Quote text
     @IBOutlet var descriptionLabel: UILabel!
 
 }
